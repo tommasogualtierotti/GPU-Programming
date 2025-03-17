@@ -1,6 +1,6 @@
 #include "../include/file_utilities.h"
 
-size_t read_strings_from_file(const char *filename, char ***strings) {
+size_t read_strings_from_file(const char *filename, char ***strings, size_t **lengths) {
 
     FILE *file = fopen(filename, "r");
 
@@ -27,6 +27,14 @@ size_t read_strings_from_file(const char *filename, char ***strings) {
         return -1;
     }
 
+    *lengths = (size_t *)malloc(num_strings * sizeof(size_t));
+    if (!lengths)
+    {
+        fprintf(stderr, "Failed to allocate memory for strings length\n");
+        fclose(file);
+        return -1;
+    }
+
     // Rewind the file and read the strings
     rewind(file);
     for (size_t i = 0; i < num_strings; i++) 
@@ -46,6 +54,8 @@ size_t read_strings_from_file(const char *filename, char ***strings) {
         }
         // Remove newline character if present
         (*strings)[i][strcspn((*strings)[i], "\n")] = '\0';
+        
+        (*lengths)[i] = strlen((*strings)[i]);
     }
 
     fclose(file);
