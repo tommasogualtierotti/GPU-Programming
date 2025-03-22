@@ -58,7 +58,7 @@ INC_DIR = include
 EXE = test
 
 # Object files:
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/file_utilities.o $(OBJ_DIR)/sha1.o
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/utilities.o $(OBJ_DIR)/sha1.o
 
 ##########################################################
 

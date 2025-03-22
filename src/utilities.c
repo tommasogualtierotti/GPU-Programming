@@ -1,4 +1,4 @@
-#include "../include/file_utilities.h"
+#include "../include/utilities.h"
 
 size_t read_strings_from_file(const char *filename, char ***strings, size_t **lengths) {
 
@@ -10,7 +10,6 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
         return -1;
     }
 
-    // Count the number of strings in the file
     size_t num_strings = 0;
     char buffer[MAX_STRING_LENGTH];
     while (fgets(buffer, MAX_STRING_LENGTH, file)) 
@@ -18,9 +17,8 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
         num_strings++;
     }
 
-    // Allocate memory for the strings
     *strings = (char **)malloc(num_strings * sizeof(char *));
-    if (!*strings) 
+    if (*strings == NULL) 
     {
         fprintf(stderr, "Failed to allocate memory for strings\n");
         fclose(file);
@@ -28,19 +26,18 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
     }
 
     *lengths = (size_t *)malloc(num_strings * sizeof(size_t));
-    if (!lengths)
+    if (*lengths == NULL)
     {
         fprintf(stderr, "Failed to allocate memory for strings length\n");
         fclose(file);
         return -1;
     }
 
-    // Rewind the file and read the strings
     rewind(file);
     for (size_t i = 0; i < num_strings; i++) 
     {
         (*strings)[i] = (char *)malloc(MAX_STRING_LENGTH * sizeof(char));
-        if (!(*strings)[i]) 
+        if ((*strings)[i] == NULL) 
         {
             fprintf(stderr, "Failed to allocate memory for string %ld\n", i);
             fclose(file);
@@ -52,7 +49,7 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
             fclose(file);
             return -1;
         }
-        // Remove newline character if present
+
         (*strings)[i][strcspn((*strings)[i], "\n")] = '\0';
         
         (*lengths)[i] = strlen((*strings)[i]);
@@ -60,4 +57,18 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
 
     fclose(file);
     return num_strings;
+}
+
+size_t elapsed_time_usec(size_t start)
+{
+    timeval tv;
+
+    gettimeofday(&tv, 0);
+
+    return ((tv.tv_sec * USECPSEC) + tv.tv_usec) - start;
+}
+
+size_t elapsed_time_msec(size_t start)
+{
+    return elapsed_time_usec(start) / 1000U;
 }
