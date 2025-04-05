@@ -28,7 +28,7 @@ NVCC_LIBS=
 
 ifeq ($(DEBUG),1)
 	CC_FLAGS+= -g
-    NVCC_FLAGS+= -g -G 	
+    NVCC_FLAGS+= -g -G
 endif
 # CUDA library directory:
 CUDA_LIB_DIR= -L$(CUDA_ROOT_DIR)/lib64
@@ -58,7 +58,7 @@ INC_DIR = include
 EXE = test
 
 # Object files:
-OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/utilities.o $(OBJ_DIR)/sha1.o
+OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/utilities.o $(OBJ_DIR)/sha1.o $(OBJ_DIR)/sha256.o $(OBJ_DIR)/md5.o $(OBJ_DIR)/cuda_utilities.o
 
 ##########################################################
 
