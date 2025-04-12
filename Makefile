@@ -23,7 +23,7 @@ SM_ARCH=75
 
 # NVCC compiler options:
 NVCC=nvcc
-NVCC_FLAGS=-gencode arch=compute_${SM_ARCH},code=sm_${SM_ARCH} -DUSE_STREAMS
+NVCC_FLAGS=-gencode arch=compute_${SM_ARCH},code=sm_${SM_ARCH}
 NVCC_LIBS=
 
 ifeq ($(DEBUG),1)
