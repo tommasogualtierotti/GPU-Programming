@@ -24,21 +24,6 @@
  *
  * @param call The CUDA API function call to check.
  */
-// #define CHECK_CUDA_ERROR(call)                                                \
-//     do {                                                                      \
-//         cudaError_t err = (call);                                             \
-//         if (err != cudaSuccess) {                                             \
-//             fprintf(stderr, "CUDA error at %s:%d - %s\n",                     \
-//                     __FILE__, __LINE__, cudaGetErrorString(err));            \
-//             exit(EXIT_FAILURE);                                               \
-//         }                                                                     \
-//         cudaError_t kernel_err = cudaGetLastError();                          \
-//         if (kernel_err != cudaSuccess) {                                      \
-//             fprintf(stderr, "Kernel launch failed at %s:%d - %s\n",          \
-//                     __FILE__, __LINE__, cudaGetErrorString(kernel_err));     \
-//             exit(EXIT_FAILURE);                                               \
-//         }                                                                     \
-//     } while (0)
 #define CHECK_CUDA_ERROR(call)                                                      \
     do {                                                                            \
         cudaError_t err_ = (call);                                                  \
