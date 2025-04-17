@@ -140,7 +140,9 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
     batch_reader_t *reader = batch_reader_init(FILENAME_PATH);
     CHECK_NULL(reader);
 
-    char *h_data = (char*)malloc(BATCH_SIZE);
+    // char *h_data = (char*)malloc(BATCH_SIZE);
+    char *h_data;
+    CHECK_CUDA_ERROR(cudaHostAlloc((void**)&h_data, BATCH_SIZE, cudaHostAllocDefault));
     CHECK_NULL(h_data);
 
     CHECK_CUDA_ERROR(cudaMalloc((void**)&d_data, BATCH_SIZE));
@@ -196,8 +198,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         CHECK_CUDA_ERROR(cudaMemset(d_lengths, 0x0, BATCH_NUM_LINES * sizeof(size_t)));
         CHECK_CUDA_ERROR(cudaMemset(d_hashes, 0x0, BATCH_NUM_LINES * SHA1_HASH_LENGTH * sizeof(hashes[0])));
     
-        CHECK_CUDA_ERROR(cudaDeviceSynchronize());
-    
         for (size_t i = 0; i < active_chunks; i++)
         {
             size_t current_lines = base_lines_per_chunk + (i < extra_lines ? 1 : 0);
@@ -227,7 +227,7 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
                 d_lengths + offset_lengths,
                 current_lines
             );
-            CHECK_CUDA_ERROR(cudaGetLastError()); // this call is used to check if an error arisen during kernel launch
+            CHECK_CUDA_ERROR(cudaGetLastError()); // this call is used to check if an error has arisen during kernel launch
     
             CHECK_CUDA_ERROR(cudaMemcpyAsync(
                 hashes + ((batch_iteration * BATCH_NUM_LINES + offset_lengths) * SHA1_HASH_LENGTH),
@@ -237,7 +237,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
                 streams[current_stream]
             ));
     
-            // update offsets
             offset_lengths += current_lines;
             offset_data += current_data;
             offset_hash += current_lines * SHA1_HASH_LENGTH;
@@ -254,15 +253,15 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         elapsed_time_stream = elapsed_time_usec(elapsed_time_stream);
         total_time_stream += elapsed_time_stream;
     
-        for (size_t i = 0; i < num_lines; i++)
-        {
-            printf("String: %s\tHash: ", input_strings[i]);
-            for (size_t j = 0; j < SHA1_HASH_LENGTH; ++j) 
-            {
-                printf("%08x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA1_HASH_LENGTH + j]);
-            }
-            printf("\n");
-        }
+        // for (size_t i = 0; i < num_lines; i++)
+        // {
+        //     printf("String: %s\tHash: ", input_strings[i]);
+        //     for (size_t j = 0; j < SHA1_HASH_LENGTH; ++j) 
+        //     {
+        //         printf("%08x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA1_HASH_LENGTH + j]);
+        //     }
+        //     printf("\n");
+        // }
 
 #else
 
@@ -288,8 +287,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
         CHECK_CUDA_ERROR(cudaMemcpy(hashes + (batch_iteration * BATCH_NUM_LINES * SHA1_HASH_LENGTH), d_hashes, num_lines * SHA1_HASH_LENGTH * sizeof(hashes[0]), cudaMemcpyDeviceToHost));
 
-        CHECK_CUDA_ERROR(cudaDeviceSynchronize());
-
         CHECK_CUDA_ERROR(cudaEventRecord(stop));
         CHECK_CUDA_ERROR(cudaEventSynchronize(stop));
         CHECK_CUDA_ERROR(cudaEventElapsedTime(&elapsed_time_nostream_gpu, start, stop));
@@ -299,15 +296,15 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         elapsed_time_nostream = elapsed_time_usec(elapsed_time_nostream);
         total_time_nostream += elapsed_time_nostream;
 
-        for (size_t i = 0; i < num_lines; i++)
-        {
-            printf("String: %s\tHash: ", input_strings[i]);
-            for (size_t j = 0; j < SHA1_HASH_LENGTH; ++j) 
-            {
-                printf("%08x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA1_HASH_LENGTH + j]);
-            }
-            printf("\n");
-        }
+        // for (size_t i = 0; i < num_lines; i++)
+        // {
+        //     printf("String: %s\tHash: ", input_strings[i]);
+        //     for (size_t j = 0; j < SHA1_HASH_LENGTH; ++j) 
+        //     {
+        //         printf("%08x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA1_HASH_LENGTH + j]);
+        //     }
+        //     printf("\n");
+        // }
 
 #endif
 
@@ -328,7 +325,8 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 #endif
     // print_execution_time(total_time_nostream_gpu, total_time_stream_gpu, total_time_nostream, total_time_stream, NULL, NULL);
 
-    free(h_data);
+    // free(h_data);
+    cudaFreeHost(h_data);
     CHECK_CUDA_ERROR(cudaFree(d_data));
     CHECK_CUDA_ERROR(cudaFree(d_hashes));
     CHECK_CUDA_ERROR(cudaFree(d_lengths));
@@ -381,10 +379,17 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
     /*
      * Memory allocation to create a unidimensional array which hosts the content of the array of strings (data)
      */
-    char *h_data = (char*)malloc(total_size);
+    // char *h_data = (char*)malloc(total_size);
+    char *h_data;
+
+    CHECK_CUDA_ERROR(cudaHostAlloc((void**)&h_data, total_size, cudaHostAllocDefault));
+
+    CHECK_NULL(h_data);
+
     memset(h_data, 0, total_size);
 
-    for (size_t i = 0; i < num_lines; i++) {
+    for (size_t i = 0; i < num_lines; i++) 
+    {
         memcpy(h_data + i * MAX_STRING_LENGTH, data[i], lengths[i]);
     }
 
@@ -400,8 +405,6 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
     size_t offset_lengths = 0;
     size_t offset_data = 0;
-
-    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
 
     for (size_t i = 0; i < CHUNKS; i++) 
     {
@@ -476,15 +479,14 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
 #endif
 
-    printf("//////////////////////////////////////////////////\n");
 #ifdef USE_STREAMS
     print_execution_time(total_time_stream_gpu, total_time_stream);
 #else
     print_execution_time(total_time_nostream_gpu, total_time_nostream);
 #endif
 
-    // Free memory
-    free(h_data);
+    // free(h_data);
+    cudaFreeHost(h_data);
     CHECK_CUDA_ERROR(cudaFree(d_data));
     CHECK_CUDA_ERROR(cudaFree(d_hashes));
     CHECK_CUDA_ERROR(cudaFree(d_lengths));
