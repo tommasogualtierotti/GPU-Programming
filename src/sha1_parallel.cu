@@ -140,9 +140,13 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
     batch_reader_t *reader = batch_reader_init(FILENAME_PATH);
     CHECK_NULL(reader);
 
-    // char *h_data = (char*)malloc(BATCH_SIZE);
+#ifdef USE_STREAMS
     char *h_data;
     CHECK_CUDA_ERROR(cudaHostAlloc((void**)&h_data, BATCH_SIZE, cudaHostAllocDefault));
+#else
+    char *h_data = (char*)malloc(BATCH_SIZE);
+#endif
+
     CHECK_NULL(h_data);
 
     CHECK_CUDA_ERROR(cudaMalloc((void**)&d_data, BATCH_SIZE));
@@ -312,6 +316,8 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
     } while (reader->batch_read_items == BATCH_NUM_LINES);
 
+    CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+
 #ifdef USE_STREAMS
     cuda_streams_destroy(streams);
 #endif
@@ -325,8 +331,12 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 #endif
     // print_execution_time(total_time_nostream_gpu, total_time_stream_gpu, total_time_nostream, total_time_stream, NULL, NULL);
 
-    // free(h_data);
+#ifdef USE_STREAMS
     cudaFreeHost(h_data);
+#else
+    free(h_data);
+#endif
+
     CHECK_CUDA_ERROR(cudaFree(d_data));
     CHECK_CUDA_ERROR(cudaFree(d_hashes));
     CHECK_CUDA_ERROR(cudaFree(d_lengths));
@@ -379,10 +389,13 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
     /*
      * Memory allocation to create a unidimensional array which hosts the content of the array of strings (data)
      */
-    // char *h_data = (char*)malloc(total_size);
-    char *h_data;
 
+#ifdef USE_STREAMS
+    char *h_data;
     CHECK_CUDA_ERROR(cudaHostAlloc((void**)&h_data, total_size, cudaHostAllocDefault));
+#else
+    char *h_data = (char*)malloc(total_size);
+#endif
 
     CHECK_NULL(h_data);
 
@@ -485,8 +498,12 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
     print_execution_time(total_time_nostream_gpu, total_time_nostream);
 #endif
 
-    // free(h_data);
+#ifdef USE_STREAMS
     cudaFreeHost(h_data);
+#else
+    free(h_data);
+#endif
+
     CHECK_CUDA_ERROR(cudaFree(d_data));
     CHECK_CUDA_ERROR(cudaFree(d_hashes));
     CHECK_CUDA_ERROR(cudaFree(d_lengths));
