@@ -72,3 +72,7 @@ void print_execution_time(float gpu_time, size_t host_time);
 // void print_execution_time(float nostream_gpu, float stream_gpu, size_t nostream_host, size_t stream_host, size_t divisor, size_t precision);
 
 void print_device_info();
+
+void allocate_cuda_host_memory(void **ptr, size_t alloc_size);
+
+void free_cuda_host_memory(void *ptr);

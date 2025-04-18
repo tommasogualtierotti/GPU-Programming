@@ -122,3 +122,16 @@ void print_device_info()
     printf("\tCooperative groups: %s\n", prop.cooperativeLaunch ? "Supported" : "Not supported");
     printf("\tECC enabled: %s\n", prop.ECCEnabled ? "Yes" : "No");
 }
+
+void allocate_cuda_host_memory(void **ptr, size_t alloc_size)
+{
+    CHECK_CUDA_ERROR(cudaHostAlloc((void**)ptr, alloc_size, cudaHostAllocDefault));
+    CHECK_NULL(ptr);
+}
+
+void free_cuda_host_memory(void *ptr)
+{
+    CHECK_NULL(ptr);
+    CHECK_CUDA_ERROR(cudaFreeHost(ptr));
+    ptr = NULL;
+}
