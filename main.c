@@ -6,6 +6,10 @@
     #include "include/utilities.h"
 #endif
 
+#ifndef CUDA_UTILITIES_CUH
+    #include "include/cuda_utilities.cuh"
+#endif
+
 #ifndef SHA1_PARALLEL_CUH
     #include "include/sha1_parallel.cuh"
 #endif
@@ -17,7 +21,6 @@
 #ifndef SHA256_H
     #include "include/sha256.h"
 #endif
-
 
 int main() {
 
@@ -35,8 +38,13 @@ int main() {
     size_t num_lines = read_strings_from_file(FILENAME_PATH, &input_strings, &data_length);
 #endif
 
+#ifdef USE_STREAMS
+    uint32_t *sha1_hashes;
+    allocate_cuda_host_memory((void**)&sha1_hashes, num_lines * SHA1_HASH_LENGTH * sizeof(sha1_hashes[0]));
+#else
     uint32_t *sha1_hashes = (uint32_t*) malloc (num_lines * SHA1_HASH_LENGTH * sizeof(sha1_hashes[0]));
     CHECK_NULL(sha1_hashes);
+#endif
 
 #ifdef BATCH_PROCESSING
     batch_reader_t *reader = batch_reader_init(FILENAME_PATH);
@@ -70,6 +78,7 @@ int main() {
 
 #endif
 #else
+
     parallel_sha1((const char **)input_strings, data_length, num_lines, sha1_hashes);
 
 #ifdef CPU_SHA1_RUN
@@ -94,6 +103,12 @@ int main() {
 
 #ifdef DEBUG_PRINT_HASHES
     print_sha1_hashes_gpu(sha1_hashes, input_strings, num_lines);
+#endif
+
+#ifdef USE_STREAMS
+    free_cuda_host_memory((void*)sha1_hashes);
+#else
+    free(sha1_hashes);
 #endif
 
     return 0;
