@@ -4,8 +4,7 @@
 
 #define FILENAME_PATH "dataset/all_patterns.dict"
 
-#define BATCH_NUM_LINES 1000000ULL   // at the moment if the batch size is bigger than the number of lines of the file, the batch reading does not work.
-                                    // if the number of lines of the file is smaller than the number of chunks the streams execution of the functions crashes
+#define BATCH_NUM_LINES 1000000ULL
 
 #define MAX_STRING_LENGTH 30ULL
 
