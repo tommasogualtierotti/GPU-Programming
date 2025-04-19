@@ -87,6 +87,7 @@ __global__ void sha1_kernel(const char *data, uint32_t *hashes, size_t *lengths,
     }
 }
 
+#ifdef USE_STREAMS
 static void cuda_streams_create(cudaStream_t *streams)
 {
     for (size_t i = 0; i < NUM_STREAMS; i++) 
@@ -106,6 +107,7 @@ static void cuda_streams_destroy(cudaStream_t *streams)
         CHECK_CUDA_ERROR(cudaStreamDestroy(streams[i]));
     }
 }
+#endif
 
 void parallel_sha1_batch_reading(uint32_t *hashes)
 {
@@ -117,22 +119,28 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
     size_t *d_lengths;
 
     cudaEvent_t start, stop;
-    static float elapsed_time_nostream_gpu = 0, total_time_nostream_gpu = 0;
-    static float elapsed_time_stream_gpu = 0, total_time_stream_gpu = 0;
-    static size_t elapsed_time_nostream = 0, total_time_nostream = 0;
-    static size_t elapsed_time_stream = 0, total_time_stream = 0;
-    
-    size_t total_size = 0;
-    size_t chunk_size = 0;
-    size_t chunk_lines = 0;
-    size_t active_chunks = 0;
-    size_t num_lines = 0;
+    size_t total_host_time = 0;
 
+#ifdef USE_STREAMS
+    static float elapsed_time_stream_gpu = 0, total_time_stream_gpu = 0;
+
+    // size_t chunk_size = 0;
+    // size_t chunk_lines = 0;
+    size_t active_chunks = 0;
+#else
+    static float elapsed_time_nostream_gpu = 0, total_time_nostream_gpu = 0;
+
+    size_t total_size = 0;
+    #endif
+    
+    size_t num_lines = 0;
     size_t batch_iteration = 0;
     
 #ifdef USE_STREAMS
     cudaStream_t streams[NUM_STREAMS] = {0};
 #endif
+
+    total_host_time = elapsed_time_usec(0);
 
     CHECK_CUDA_ERROR(cudaEventCreate(&start));
     CHECK_CUDA_ERROR(cudaEventCreate(&stop));
@@ -165,8 +173,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
         num_lines = reader->batch_read_items;
 
-        total_size = num_lines * MAX_STRING_LENGTH;
-
         if (num_lines == 0)
         {
             break;
@@ -180,8 +186,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         }
 
 #ifdef USE_STREAMS
-
-        elapsed_time_stream = elapsed_time_usec(0);
 
         CHECK_CUDA_ERROR(cudaEventRecord(start));
 
@@ -253,9 +257,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         CHECK_CUDA_ERROR(cudaEventElapsedTime(&elapsed_time_stream_gpu, start, stop));
 
         total_time_stream_gpu += elapsed_time_stream_gpu;
-
-        elapsed_time_stream = elapsed_time_usec(elapsed_time_stream);
-        total_time_stream += elapsed_time_stream;
     
         // for (size_t i = 0; i < num_lines; i++)
         // {
@@ -269,7 +270,7 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
 #else
 
-        elapsed_time_nostream = elapsed_time_usec(0);
+        total_size = num_lines * MAX_STRING_LENGTH;
 
         CHECK_CUDA_ERROR(cudaEventRecord(start));
 
@@ -297,9 +298,6 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
         total_time_nostream_gpu += elapsed_time_nostream_gpu;
 
-        elapsed_time_nostream = elapsed_time_usec(elapsed_time_nostream);
-        total_time_nostream += elapsed_time_nostream;
-
         // for (size_t i = 0; i < num_lines; i++)
         // {
         //     printf("String: %s\tHash: ", input_strings[i]);
@@ -324,10 +322,12 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 
     batch_reader_close(reader);
 
+    total_host_time = elapsed_time_usec(total_host_time);
+
 #ifdef USE_STREAMS
-    print_execution_time(total_time_stream_gpu, total_time_stream);
+    print_execution_time(total_time_stream_gpu, total_host_time);
 #else
-    print_execution_time(total_time_nostream_gpu, total_time_nostream);
+    print_execution_time(total_time_nostream_gpu, total_host_time);
 #endif
     // print_execution_time(total_time_nostream_gpu, total_time_stream_gpu, total_time_nostream, total_time_stream, NULL, NULL);
 
@@ -354,14 +354,16 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
     size_t *d_lengths;
 
     cudaEvent_t start, stop;
-    static float elapsed_time_nostream_gpu = 0, total_time_nostream_gpu = 0;
-    static float elapsed_time_stream_gpu = 0, total_time_stream_gpu = 0;
 
-    static size_t elapsed_time_nostream = 0, total_time_nostream = 0;
-    static size_t elapsed_time_stream = 0, total_time_stream = 0;
+#ifdef USE_STREAMS
+    static float elapsed_time_stream_gpu = 0, total_time_stream_gpu = 0;
+    // size_t chunk_size = 0;
+#else
+    static float elapsed_time_nostream_gpu = 0, total_time_nostream_gpu = 0;
+#endif
 
     size_t total_size = 0;
-    size_t chunk_size = 0;
+    size_t total_host_time = 0;
 
 #ifdef USE_STREAMS
     cudaStream_t streams[NUM_STREAMS];
@@ -370,6 +372,8 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
     // size_t free_memory, total_available_memory;
     // get_gpu_memory_allocation_info(num_lines, sizeof(hashes[0]), sizeof(lengths[0]), &free_memory, &total_available_memory, MiB_MEMORY_VALUE);
     // get_gpu_memory_allocation_info(num_lines, SHA1_HASH_LENGTH * sizeof(hashes[0]), sizeof(lengths[0]), NULL, NULL, MiB_MEMORY_VALUE);
+
+    total_host_time = elapsed_time_usec(0);
 
     CHECK_CUDA_ERROR(cudaEventCreate(&start));
     CHECK_CUDA_ERROR(cudaEventCreate(&stop));
@@ -408,7 +412,6 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
 #ifdef USE_STREAMS
 
-    elapsed_time_stream = elapsed_time_usec(0);
     CHECK_CUDA_ERROR(cudaEventRecord(start));
 
     cuda_streams_create(streams);
@@ -460,14 +463,9 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
     total_time_stream_gpu += elapsed_time_stream_gpu;
 
-    elapsed_time_stream = elapsed_time_usec(elapsed_time_stream);
-    total_time_stream += elapsed_time_stream;
-
     // print_execution_time(total_time_nostream_gpu, total_time_stream_gpu, total_time_nostream, total_time_stream, NULL, NULL);
 
 #else
-
-    elapsed_time_nostream = elapsed_time_usec(0);
 
     CHECK_CUDA_ERROR(cudaEventRecord(start));
 
@@ -487,15 +485,14 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
     total_time_nostream_gpu += elapsed_time_nostream_gpu;
 
-    elapsed_time_nostream = elapsed_time_usec(elapsed_time_nostream);
-    total_time_nostream += elapsed_time_nostream;
-
 #endif
 
+    total_host_time = elapsed_time_usec(total_host_time);
+
 #ifdef USE_STREAMS
-    print_execution_time(total_time_stream_gpu, total_time_stream);
+    print_execution_time(total_time_stream_gpu, total_host_time);
 #else
-    print_execution_time(total_time_nostream_gpu, total_time_nostream);
+    print_execution_time(total_time_nostream_gpu, total_host_time);
 #endif
 
 #ifdef USE_STREAMS
