@@ -89,7 +89,7 @@ void print_execution_time(float gpu_time, size_t host_time)
     // printf("Total execution time seen from host without streams: %.3fms\n", nostream_host / MSECPSEC_DIV);
     // printf("Total execution time seen from host with streams: %.3fms\n", stream_host / MSECPSEC_DIV);
     printf("Time of GPU: %.3f ms\n", gpu_time);
-    printf("Total execution time seen from host: %.3fms\n", gpu_time / MSECPSEC_DIV);
+    printf("Total execution time seen from host: %.3fms\n", host_time / MSECPSEC_DIV);
 }
 
 void print_device_info() 

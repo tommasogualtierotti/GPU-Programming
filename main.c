@@ -53,6 +53,8 @@ int main() {
     parallel_sha1_batch_reading(sha1_hashes); // handle in an another way the stop condition in the batch reading
 
 #ifdef CPU_SHA1_RUN
+    size_t cpu_elapsed_time = elapsed_time_usec(0);
+
     reader = batch_reader_init(FILENAME_PATH);
     CHECK_NULL(reader);
 
@@ -76,6 +78,8 @@ int main() {
 
     batch_reader_close(reader);
 
+    cpu_elapsed_time = elapsed_time_usec(cpu_elapsed_time);
+    printf("Total execution of CPU SHA1: %.3fms\n", cpu_elapsed_time / (float)MSECPSEC);
 #endif
 #else
 
