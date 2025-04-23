@@ -1,5 +1,17 @@
-#include "../include/sha1.h"
+#ifndef SHA1_H
+    #include "../include/sha1.h"
+#endif
 
+/**
+ * @brief Compute SHA-1 hash for a message.
+ *
+ * This function implements the SHA-1 algorithm: it pads the input message,
+ * processes it in 64-byte chunks, and outputs a 20-byte (160-bit) hash.
+ *
+ * @param message Pointer to the input data.
+ * @param length Length of the input data in bytes.
+ * @param hash Output array of 20 bytes to receive the SHA-1 digest.
+ */
 void sha1(const char *message, size_t length, uint8_t hash[20]) {
     uint32_t h[5] = {0x67452301, 0xEFCDAB89, 0x98BADCFE, 0x10325476, 0xC3D2E1F0};
     uint64_t total_bits = length * 8;

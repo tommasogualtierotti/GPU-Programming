@@ -1,5 +1,14 @@
-#include "../include/md5.h"
+#ifndef MD5_H
+    #include "../include/md5.h"
+#endif
 
+/**
+ * @brief Initializes the MD5 context.
+ * 
+ * This function sets the initial values for the MD5 context, including the state variables and lengths.
+ * 
+ * @param ctx A pointer to the MD5 context to be initialized.
+ */
 void md5_init(MD5_CTX_t *ctx) {
     ctx->datalen = 0;
     ctx->bitlen = 0;
@@ -9,6 +18,15 @@ void md5_init(MD5_CTX_t *ctx) {
     ctx->state[3] = 0x10325476; // D
 }
 
+/**
+ * @brief Performs one round of MD5 transformation on the context using the given 64-byte data block.
+ * 
+ * This function processes a 64-byte block of data and updates the MD5 state. It applies the MD5 transformation 
+ * logic as specified in the MD5 algorithm.
+ * 
+ * @param ctx  A pointer to the MD5 context that holds the state to be updated.
+ * @param data A 64-byte chunk of message data to be processed.
+ */
 void md5_transform(MD5_CTX_t *ctx, const uint8_t data[]) {
     uint32_t a, b, c, d, m[16], i, j;
 
@@ -48,6 +66,16 @@ void md5_transform(MD5_CTX_t *ctx, const uint8_t data[]) {
     ctx->state[3] += d;
 }
 
+/**
+ * @brief Updates the MD5 context with new data.
+ * 
+ * This function processes the input data, updates the context with each chunk of data, and performs the necessary 
+ * transformations when a 64-byte block is filled.
+ * 
+ * @param ctx  A pointer to the MD5 context that holds the state.
+ * @param data A pointer to the data to be hashed.
+ * @param len  The length of the data to be processed.
+ */
 void md5_update(MD5_CTX_t *ctx, const uint8_t *data, size_t len) {
     for (size_t i = 0; i < len; i++) {
         ctx->data[ctx->datalen] = data[i];
@@ -61,6 +89,15 @@ void md5_update(MD5_CTX_t *ctx, const uint8_t *data, size_t len) {
     }
 }
 
+/**
+ * @brief Finalizes the MD5 computation and produces the hash.
+ * 
+ * This function applies padding and appends the length of the input message, then performs the final transformation 
+ * to generate the hash value.
+ * 
+ * @param ctx  A pointer to the MD5 context containing the current state.
+ * @param hash The output buffer to store the 128-bit (16-byte) hash value.
+ */
 void md5_final(MD5_CTX_t *ctx, uint8_t hash[]) {
     size_t i;
 
@@ -87,6 +124,17 @@ void md5_final(MD5_CTX_t *ctx, uint8_t hash[]) {
     
 }
 
+
+/**
+ * @brief Computes the MD5 hash of a message.
+ * 
+ * This function initializes the MD5 context, processes the message in chunks, and finalizes the hash computation.
+ * 
+ * @param ctx        A pointer to the MD5 context.
+ * @param message    A pointer to the message to be hashed.
+ * @param msg_length The length of the message in bytes.
+ * @param hash       The output buffer to store the MD5 hash value.
+ */
 void md5 ( MD5_CTX_t *ctx, const uint8_t* message, uint64_t msg_length, uint8_t* hash )
 {
     md5_init ( ctx );

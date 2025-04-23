@@ -1,5 +1,16 @@
-#include "../include/sha256.h"
+#ifndef SHA256_H
+    #include "../include/sha256.h"
+#endif
 
+/**
+ * @brief Performs one round of SHA-256 transformation on the state using the given 64-byte data block.
+ * 
+ * This function processes a 64-byte block of data and updates the SHA-256 state. It uses the constants and
+ * functions defined in the SHA-256 specification to compute the hash transformation.
+ * 
+ * @param state The current state of the SHA-256 hash.
+ * @param data  A 64-byte chunk of message data to be processed.
+ */
 void sha256_transform(uint32_t state[8], const uint8_t data[64]) {
     uint32_t W[64], a, b, c, d, e, f, g, h, T1, T2;
 
@@ -40,6 +51,17 @@ void sha256_transform(uint32_t state[8], const uint8_t data[64]) {
     state[7] += h;
 }
 
+
+/**
+ * @brief Computes the SHA-256 hash of a message.
+ * 
+ * This function processes the input message in blocks, applies padding, and computes the SHA-256 hash. The
+ * final hash value is stored in the provided hash output buffer.
+ * 
+ * @param message The input message to be hashed.
+ * @param length  The length of the input message in bytes.
+ * @param hash    The output buffer to store the 256-bit (32-byte) hash value.
+ */
 void sha256(const uint8_t *message, size_t length, uint8_t hash[32]) {
     uint32_t state[8] = {
         0x6a09e667, 0xbb67ae85, 0x3c6ef372, 0xa54ff53a,

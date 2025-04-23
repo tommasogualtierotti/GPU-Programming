@@ -9,20 +9,21 @@
 /**
  * @brief Left-rotate a 32-bit integer.
  *
- * This macro performs a circular left rotation of a 32-bit integer by a given number of bits.
+ * Performs a circular left rotation of a 32-bit integer by a specified number of bits.
  *
  * @param a The 32-bit integer to rotate.
- * @param b The number of bits to rotate.
+ * @param b The number of bits to rotate by (0–31).
  */
 #define ROTLEFT(a,b) (((a) << (b)) | ((a) >> (32-(b))))
 
 /**
- * @brief Macro to check for CUDA errors.
+ * @brief Check and report CUDA API and kernel launch errors.
  *
- * This macro wraps a CUDA API call and checks for errors. If an error occurs, it prints the
- * error message along with the file and line number, then exits the program.
+ * Wraps a CUDA API call, checks its return value, and then checks for any
+ * deferred kernel launch errors. On error, prints the failed call, file,
+ * and line number, then exits.
  *
- * @param call The CUDA API function call to check.
+ * @param call The CUDA runtime API or kernel launch call to check.
  */
 #define CHECK_CUDA_ERROR(call)                                                      \
     do {                                                                            \
@@ -41,38 +42,86 @@
     } while (0)
 
 /**
- * @brief Retrieves GPU memory allocation information based on hashing workload.
+ * @brief Calculate and print GPU memory requirements for SHA-1 workload.
  *
- * This function calculates the amount of free and total available GPU memory considering
- * the required allocations for a SHA-1 hashing workload.
+ * Retrieves free and total GPU memory, then calculates and prints memory
+ * needed for storing input lines, their lengths, and output hashes.
  *
- * @param num_lines Number of input lines to process.
- * @param hash_size Size of the output hash storage.
- * @param lengths_size Size of the input lengths array.
- * @param free_mem Pointer to store the amount of free memory (in bytes).
- * @param total_avlbl_mem Pointer to store the total available GPU memory (in bytes).
- * @param shift_modifier Modifier to adjust measurement unit memory size displaying.
+ * @param num_lines Number of input strings to process.
+ * @param hash_size Size in bytes of the hash storage per string.
+ * @param lengths_size Size in bytes of the length array element.
+ * @param free_mem Optional pointer to receive free device memory (bytes).
+ * @param total_avlbl_mem Optional pointer to receive total device memory (bytes).
  */
-void get_gpu_memory_allocation_info(size_t num_lines, size_t hash_size, size_t lengths_size, 
-                                    size_t *free_mem, size_t *total_avlbl_mem, size_t shift_modifier);
+void get_gpu_memory_allocation_info(size_t num_lines,
+                                    size_t hash_size,
+                                    size_t lengths_size,
+                                    size_t *free_mem,
+                                    size_t *total_avlbl_mem);
 
 /**
- * @brief Retrieves the current free and total available GPU memory.
+ * @brief Print current free and total GPU memory.
  *
- * This function queries the GPU for its available and total memory, applying a shift modifier
- * if necessary.
+ * Queries the CUDA runtime for free and total device memory and prints the values.
  *
- * @param free_mem Pointer to store the amount of free memory (in bytes).
- * @param total_avlbl_mem Pointer to store the total available GPU memory (in bytes).
- * @param shift_modifier Modifier to adjust measurement unit memory size displaying.
+ * @param free_mem Optional pointer to receive free device memory (bytes).
+ * @param total_avlbl_mem Optional pointer to receive total device memory (bytes).
  */
-void get_gpu_memory_info(size_t *free_mem, size_t *total_avlbl_mem, size_t shift_modifier);
+void get_gpu_memory_info(size_t *free_mem,
+                         size_t *total_avlbl_mem);
 
+/**
+ * @brief Print measured GPU and host execution times.
+ *
+ * Depending on whether streams are used, prints GPU time and total host time.
+ *
+ * @param gpu_time GPU execution time measured by CUDA events (milliseconds).
+ * @param host_time Host-side execution time measured in microseconds.
+ */
 void print_execution_time(float gpu_time, size_t host_time);
-// void print_execution_time(float nostream_gpu, float stream_gpu, size_t nostream_host, size_t stream_host, size_t divisor, size_t precision);
 
+/**
+ * @brief Print detailed properties of the current CUDA device.
+ *
+ * Retrieves and prints properties like compute capability, memory sizes,
+ * multiprocessor count, clock rates, and more.
+ */
 void print_device_info();
 
+/**
+ * @brief Allocate pinned host memory for a single pointer.
+ *
+ * Uses cudaHostAlloc to allocate page-locked memory on the host.
+ *
+ * @param ptr Address of the host pointer to allocate.
+ * @param alloc_size Number of bytes to allocate.
+ */
 void allocate_cuda_host_memory(void **ptr, size_t alloc_size);
 
+/**
+ * @brief Free pinned host memory allocated by cudaHostAlloc.
+ *
+ * Uses cudaFreeHost to release page-locked host memory.
+ *
+ * @param ptr Host pointer to free.
+ */
 void free_cuda_host_memory(void *ptr);
+
+/**
+ * @brief Allocate pinned host memory for an array of pointers.
+ *
+ * Allocates page-locked host memory sufficient to hold an array of pointers.
+ *
+ * @param ptr Address of the double pointer to allocate.
+ * @param alloc_size Number of bytes to allocate (e.g., count * sizeof(void*)).
+ */
+void allocate_cuda_host_memory_double_ptr(void ***ptr, size_t alloc_size);
+
+/**
+ * @brief Free pinned host memory allocated for an array of pointers.
+ *
+ * Releases page-locked host memory previously allocated for a double pointer.
+ *
+ * @param ptr The double pointer whose memory should be freed.
+ */
+void free_cuda_host_memory_double_ptr(void **ptr);

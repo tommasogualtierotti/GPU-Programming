@@ -27,9 +27,11 @@ int main() {
     char **input_strings = NULL;
     size_t *data_length = NULL;
 
-#ifdef PRINT_GPU_MEMORY_INFO
+#ifdef PRINT_GPU_INFO
     size_t free_memory, total_available_memory;
     get_gpu_memory_info(&free_memory, &total_available_memory, MiB_MEMORY_VALUE);
+
+    print_device_info();
 #endif
 
 #ifdef BATCH_PROCESSING

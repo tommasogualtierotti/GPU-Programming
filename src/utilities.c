@@ -1,10 +1,19 @@
-#include "../include/utilities.h"
+#ifndef UTILITIES_H
+    #include "../include/utilities.h"
+#endif
 
+/**
+ * @brief Count the number of lines in a file.
+ *
+ * Opens the specified file, reads through each line to count them,
+ * then closes the file.
+ *
+ * @param filename Path to the input file.
+ * @return Number of lines in the file.
+ */
 size_t line_count(const char *filename) 
 {
-
     FILE *file = fopen(filename, "r");
-
     if (!file) 
     {
         fprintf(stderr, "Failed to open file: %s\n", filename);
@@ -12,34 +21,29 @@ size_t line_count(const char *filename)
     }
 
     size_t num_strings = 0;
-
     char buffer[MAX_STRING_LENGTH];
-
     while (fgets(buffer, MAX_STRING_LENGTH, file)) 
     {
         num_strings++;
     }
-
     fclose(file);
-    
     return num_strings;
 }
+
 /**
- * @brief Reads all strings from a file into memory.
+ * @brief Reads all strings from a file into dynamically allocated arrays.
  *
- * This function reads all lines from the given file, storing them as strings
- * and their respective lengths in dynamically allocated arrays.
+ * Allocates arrays for the strings and their lengths, reads each line
+ * into its own buffer, strips the newline, and records its length.
  *
- * @param filename The name of the file to read from.
- * @param strings Pointer to an array of strings (output).
- * @param lengths Pointer to an array of string lengths (output).
- * @return The number of strings read, or -1 on failure.
+ * @param filename Path to the input file.
+ * @param strings Output pointer to array of string pointers.
+ * @param lengths Output pointer to array of string lengths.
+ * @return Number of strings read.
  */
 size_t read_strings_from_file(const char *filename, char ***strings, size_t **lengths) 
 {
-
     FILE *file = fopen(filename, "r");
-
     if (!file) 
     {
         fprintf(stderr, "Failed to open file: %s\n", filename);
@@ -47,9 +51,7 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
     }
 
     size_t num_strings = 0;
-
     char buffer[MAX_STRING_LENGTH];
-
     while (fgets(buffer, MAX_STRING_LENGTH, file)) 
     {
         num_strings++;
@@ -72,27 +74,23 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
     }
 
     rewind(file);
-    
     for (size_t i = 0; i < num_strings; i++) 
     {
         (*strings)[i] = (char *)malloc(MAX_STRING_LENGTH * sizeof(char));
-
         if ((*strings)[i] == NULL) 
         {
-            fprintf(stderr, "Failed to allocate memory for string %ld\n", i);
+            fprintf(stderr, "Failed to allocate memory for string %zu\n", i);
             fclose(file);
             exit(-1);
         }
 
         if (!fgets((*strings)[i], MAX_STRING_LENGTH, file)) 
         {
-            fprintf(stderr, "Failed to read string %ld from file\n", i);
+            fprintf(stderr, "Failed to read string %zu from file\n", i);
             fclose(file);
             exit(-1);
         }
-
         (*strings)[i][strcspn((*strings)[i], "\n")] = '\0';
-        
         (*lengths)[i] = strlen((*strings)[i]);
     }
 
@@ -101,62 +99,60 @@ size_t read_strings_from_file(const char *filename, char ***strings, size_t **le
 }
 
 /**
- * @brief Initializes a batch reader for reading file contents in chunks.
+ * @brief Initialize a batch reader for chunked file reading.
  *
- * @param filename The name of the file to read.
- * @return A pointer to an initialized batch_reader_t structure, or NULL on failure.
+ * Allocates and initializes a batch_reader_t, opens the file,
+ * counts total lines, and prepares for batch reads.
+ *
+ * @param filename Path to the input file.
+ * @return Pointer to the initialized batch_reader_t, or NULL on failure.
  */
 batch_reader_t* batch_reader_init(const char *filename) 
 {
-
     batch_reader_t* batch_reader = (batch_reader_t *)malloc(sizeof(batch_reader_t));
-    
     if (batch_reader == NULL) 
     {
         perror("Memory allocation failed");
         return NULL;
     }
-    
-    batch_reader->file = fopen(filename, "r");
 
+    batch_reader->file = fopen(filename, "r");
     if (batch_reader->file == NULL) 
     {
         perror("Error opening file");
         free(batch_reader);
         return NULL;
     }
-    
+
     batch_reader->buffer_pos = 0;
     batch_reader->batch_read_items = 0;
 
     size_t num_strings = 0;
-
     char buffer[MAX_STRING_LENGTH];
-
     while (fgets(buffer, MAX_STRING_LENGTH, batch_reader->file)) 
     {
         num_strings++;
     }
-
     batch_reader->total_items = num_strings;
-
     rewind(batch_reader->file);
 
     return batch_reader;
 }
 
 /**
- * @brief Reads a batch of strings from a file using a batch reader.
+ * @brief Read a fixed-size batch of strings from a file.
  *
- * @param batch_reader Pointer to an initialized batch_reader_t.
- * @param strings Pointer to an array of strings (output).
- * @param lengths Pointer to an array of string lengths (output).
- * @return The number of strings read in the batch, or -1 on failure.
+ * Reads up to BATCH_NUM_LINES lines into preallocated buffers,
+ * zeroing or allocating as needed on each call.
+ *
+ * @param batch_reader Initialized batch_reader_t.
+ * @param strings In/out pointer to array of string buffers.
+ * @param lengths In/out pointer to array of string lengths.
+ * @return Number of strings read in this batch.
  */
 size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***strings, size_t **lengths) 
 {
-
-    if (batch_reader == NULL || batch_reader -> file == NULL)
+    if (batch_reader == NULL || batch_reader->file == NULL)
     {
         perror("Batch reader not correctly initialized");
         exit(-1);
@@ -164,9 +160,6 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
 
     batch_reader->batch_read_items = 0;
 
-    /* If the pointer is not NULL it means it was already allocated in the previous iteration,
-     * therefore the previous content is zeroed out and new content is written.
-     */
     if (*strings != NULL)
     {
         memset(*strings, 0x0, BATCH_NUM_LINES * sizeof(char *));
@@ -174,7 +167,6 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
     else
     {
         *strings = (char **)calloc(BATCH_NUM_LINES, sizeof(char *));
-
         if (*strings == NULL)
         {
             perror("Memory allocation failed");
@@ -182,9 +174,6 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
         }
     }
 
-    /* If the pointer is not NULL it means it was already allocated in the previous iteration,
-     * therefore the previous content is zeroed out and new content is written.
-     */
     if (*lengths != NULL)
     {
         memset(*lengths, 0x0, BATCH_NUM_LINES * sizeof(size_t));
@@ -192,7 +181,6 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
     else
     {
         *lengths = (size_t *)calloc(BATCH_NUM_LINES, sizeof(size_t));
-
         if (*lengths == NULL)
         {
             perror("Memory allocation failed");
@@ -201,23 +189,18 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
     }
 
     ssize_t lines_read = 0;
-
     while (lines_read < BATCH_NUM_LINES)
     {
-        /* If the pointer is not NULL it means it was already allocated in the previous iteration,
-         * therefore the previous content is zeroed out and new content is written.
-         */
         if ((*strings)[lines_read] != NULL)
         {
-            memset(*strings[lines_read], 0x0, MAX_STRING_LENGTH * sizeof(char));
+            memset((*strings)[lines_read], 0x0, MAX_STRING_LENGTH * sizeof(char));
         } 
         else
         {
             (*strings)[lines_read] = (char *)calloc(MAX_STRING_LENGTH, sizeof(char));
-
             if ((*strings)[lines_read] == NULL) 
             {
-                fprintf(stderr, "Failed to allocate memory for string %ld\n", lines_read);
+                fprintf(stderr, "Failed to allocate memory for string %zd\n", lines_read);
                 batch_reader_close(batch_reader);
                 exit(-1);
             }
@@ -225,18 +208,11 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
 
         if (!fgets((*strings)[lines_read], MAX_STRING_LENGTH, batch_reader->file)) 
         {
-            /* In case we terminate earlier than BATCH_NUM_LINES reading lines the number of read lines is returned,
-             * in this way the fact that the end of the file was reached can be signaled.
-             */
             batch_reader->batch_read_items = lines_read;
             return lines_read;
-            // fprintf(stderr, "Failed to read string %ld from file\n", lines_read);
-            // batch_reader_close(batch_reader);
-            // return EXIT_FAILURE;
         }
 
         (*strings)[lines_read][strcspn((*strings)[lines_read], "\n")] = '\0';
-
         (*lengths)[lines_read] = strlen((*strings)[lines_read]);
 
         batch_reader->buffer_pos++;
@@ -244,16 +220,17 @@ size_t batch_read_strings_from_file(batch_reader_t *batch_reader, char ***string
     }
 
     batch_reader->batch_read_items = lines_read;
-
     batch_reader->iteration++;
 
     return lines_read;
 }
 
 /**
- * @brief Closes a batch reader and releases allocated resources.
+ * @brief Close and free resources for a batch reader.
  *
- * @param batch_reader Pointer to the batch_reader_t to be closed.
+ * Closes the file and frees the batch_reader_t struct.
+ *
+ * @param batch_reader Pointer to the batch_reader_t to close.
  */
 void batch_reader_close(batch_reader_t *batch_reader) 
 {
@@ -265,6 +242,11 @@ void batch_reader_close(batch_reader_t *batch_reader)
     }
 }
 
+/**
+ * @brief Rewind the batch reader's file to the beginning.
+ *
+ * @param batch_reader Pointer to the batch_reader_t to rewind.
+ */
 void batch_reader_rewind_file(batch_reader_t* batch_reader)
 {
     CHECK_NULL(batch_reader);
@@ -272,20 +254,30 @@ void batch_reader_rewind_file(batch_reader_t* batch_reader)
 }
 
 /**
- * @brief Calculates the elapsed time in microseconds from a given start time.
+ * @brief Compute elapsed time in microseconds since start.
  *
- * @param start The starting timestamp in microseconds.
- * @return The elapsed time in microseconds.
+ * Uses gettimeofday() to compute the delta from the given start time.
+ *
+ * @param start Start time in microseconds.
+ * @return Elapsed time in microseconds.
  */
 size_t elapsed_time_usec(size_t start)
 {
     timeval tv;
-
     gettimeofday(&tv, 0);
-
     return ((tv.tv_sec * USECPSEC) + tv.tv_usec) - start;
 }
 
+/**
+ * @brief Print SHA-1 hashes computed on the GPU.
+ *
+ * Iterates over each string and its corresponding hash,
+ * printing the string and its 5-word (20-byte) hash in hex.
+ *
+ * @param hashes Array of uint32_t hashes (5 words per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
 void print_sha1_hashes_gpu(uint32_t *hashes, char **strings, size_t num_lines)
 {
     CHECK_NULL(hashes);
@@ -301,12 +293,22 @@ void print_sha1_hashes_gpu(uint32_t *hashes, char **strings, size_t num_lines)
     }
 }
 
+/**
+ * @brief Print SHA-1 hashes computed on the CPU.
+ *
+ * Iterates over each string and its corresponding 20-byte hash,
+ * printing the string and hash in two-digit hex.
+ *
+ * @param hashes Array of uint8_t hashes (20 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
 void print_sha1_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines)
 {
     CHECK_NULL(hashes);
     CHECK_NULL(strings);
 
-    uint8_t hash_size_bytes = 20;
+    const size_t hash_size_bytes = 20;
 
     for (size_t i = 0; i < num_lines; i++)
     {
