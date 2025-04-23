@@ -29,7 +29,7 @@ int main() {
 
 #ifdef PRINT_GPU_INFO
     size_t free_memory, total_available_memory;
-    get_gpu_memory_info(&free_memory, &total_available_memory, MiB_MEMORY_VALUE);
+    get_gpu_memory_info(&free_memory, &total_available_memory);
 
     print_device_info();
 #endif

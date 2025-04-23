@@ -29,7 +29,7 @@
  * If this macro is defined, CUDA streams will be used to perform asynchronous tasks and improve performance.
  */
 #ifndef USE_STREAMS
-#define USE_STREAMS
+    // #define USE_STREAMS
 #endif
 
 /**
@@ -59,7 +59,7 @@
  * 
  * If this macro is defined, batch processing is enabled for the hashing operations.
  */
-#define BATCH_PROCESSING
+// #define BATCH_PROCESSING
 
 /**
  * @brief Enable CPU-based SHA-1 hash computation.
@@ -73,25 +73,25 @@
  * 
  * If this macro is defined, the SHA-256 hashing operation will run on the CPU.
  */
-#define CPU_SHA256_RUN
+// #define CPU_SHA256_RUN
 
 /**
  * @brief Enable CPU-based MD5 hash computation.
  * 
  * If this macro is defined, the MD5 hashing operation will run on the CPU.
  */
-#define CPU_SHAMD5_RUN
+// #define CPU_SHAMD5_RUN
 
 /**
  * @brief Enable debug printing of hashes.
  * 
  * If this macro is defined, debug information related to hash computations will be printed.
  */
-#define DEBUG_PRINT_HASHES
+// #define DEBUG_PRINT_HASHES
 
 /**
  * @brief Enable printing of GPU information.
  * 
  * If this macro is defined, information about the GPU hardware and CUDA execution will be printed.
  */
-#define PRINT_GPU_INFO
+// #define PRINT_GPU_INFO
