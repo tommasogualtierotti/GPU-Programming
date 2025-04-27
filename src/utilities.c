@@ -308,13 +308,112 @@ void print_sha1_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines)
     CHECK_NULL(hashes);
     CHECK_NULL(strings);
 
-    const size_t hash_size_bytes = 20;
+    for (size_t i = 0; i < num_lines; i++)
+    {
+        printf("String: %s\tHash: ", strings[i]);
+        for (size_t j = 0; j < SHA1_HASH_LENGTH_BYTES; ++j) {
+            printf("%02x", hashes[i * SHA1_HASH_LENGTH_BYTES + j]);
+        }
+        printf("\n");
+    }
+}
+
+/**
+ * @brief Print MD5 hashes computed on the GPU.
+ *
+ * Iterates over each string and its corresponding hash,
+ * printing the string and its 4-word (16-byte) hash in hex.
+ *
+ * @param hashes Array of uint32_t hashes (16 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_md5_hashes_gpu(uint8_t *hashes, char **strings, size_t num_lines)
+{
+    CHECK_NULL(hashes);
+    CHECK_NULL(strings);
 
     for (size_t i = 0; i < num_lines; i++)
     {
         printf("String: %s\tHash: ", strings[i]);
-        for (size_t j = 0; j < hash_size_bytes; ++j) {
-            printf("%02x", hashes[i * hash_size_bytes + j]);
+        for (size_t j = 0; j < MD5_HASH_LENGTH_BYTES; ++j) {
+            printf("%02x", hashes[i * MD5_HASH_LENGTH_BYTES + j]);
+        }
+        printf("\n");
+    }
+}
+
+/**
+ * @brief Print MD5 hashes computed on the CPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 16‑byte hash in two‑digit hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (16 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_md5_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines)
+{
+
+    CHECK_NULL(hashes);
+    CHECK_NULL(strings);
+
+    for (size_t i = 0; i < num_lines; i++)
+    {
+        printf("String: %s\tHash: ", strings[i]);
+        for (size_t j = 0; j < MD5_HASH_LENGTH_BYTES; ++j) {
+            printf("%02x", hashes[i * MD5_HASH_LENGTH_BYTES + j]);
+        }
+        printf("\n");
+    }
+}
+
+/**
+ * @brief Print SHA-256 hashes computed on the GPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 8‑word (32‑byte) hash in hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (32 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_sha256_hashes_gpu(uint8_t *hashes, char **strings, size_t num_lines)
+{
+    CHECK_NULL(hashes);
+    CHECK_NULL(strings);
+
+    for (size_t i = 0; i < num_lines; i++)
+    {
+        printf("String: %s\tHash: ", strings[i]);
+        for (size_t j = 0; j < SHA256_HASH_LENGTH_BYTES; ++j) {
+            printf("%02x", hashes[i * SHA256_HASH_LENGTH_BYTES + j]);
+        }
+        printf("\n");
+    }
+}
+
+/**
+ * @brief Print SHA‑256 hashes computed on the CPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 32‑byte hash in two‑digit hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (32 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_sha256_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines)
+{
+    CHECK_NULL(hashes);
+    CHECK_NULL(strings);
+
+    for (size_t i = 0; i < num_lines; i++)
+    {
+        printf("String: %s\tHash: ", strings[i]);
+        for (size_t j = 0; j < SHA256_HASH_LENGTH_BYTES; ++j) {
+            printf("%02x", hashes[i * SHA256_HASH_LENGTH_BYTES + j]);
         }
         printf("\n");
     }

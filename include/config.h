@@ -1,97 +1,144 @@
 #ifndef CONFIG_H
-    #define CONFIG_H
-#endif
+#define CONFIG_H
 
 /**
- * @brief The file path for the dataset.
- * 
- * This macro defines the path to the dictionary file that will be used in the application.
+ * @file config.h
+ * @brief Configuration header for the CUDA-based cryptographic hashing application.
+ *
+ * This file contains macro definitions used to configure the behavior of
+ * the parallel SHA-1, SHA-256, and MD5 hashing implementations.
  */
-#define FILENAME_PATH "dataset/italian.dict"
 
-/**
- * @brief The number of lines to process in each batch.
- * 
- * This macro defines the batch size (in terms of the number of lines) to process at a time.
+/** 
+ * @def FILENAME_PATH
+ * @brief The file path for the dataset.
+ *
+ * Defines the path to the dictionary file that will be used in the application.
+ */
+#define FILENAME_PATH "dataset/test.dict"
+
+/** 
+ * @def BATCH_NUM_LINES
+ * @brief Number of lines to process in each batch.
+ *
+ * Defines the batch size (number of lines) to process at a time.
  */
 #define BATCH_NUM_LINES 1000000ULL
 
-/**
- * @brief The maximum length of a string.
- * 
- * This macro defines the maximum number of characters allowed in a string to be processed.
+/** 
+ * @def MAX_STRING_LENGTH
+ * @brief Maximum length of a string.
+ *
+ * Defines the maximum number of characters allowed in a string to be processed.
  */
 #define MAX_STRING_LENGTH 30ULL
 
 /**
+ * @def USE_STREAMS
  * @brief Enable CUDA streams for parallel execution.
- * 
- * If this macro is defined, CUDA streams will be used to perform asynchronous tasks and improve performance.
+ *
+ * If defined, CUDA streams will be used to perform asynchronous tasks and improve performance.
  */
 #ifndef USE_STREAMS
-    // #define USE_STREAMS
+// #define USE_STREAMS
 #endif
 
-/**
- * @brief The number of CUDA streams to use.
- * 
- * This macro specifies the number of CUDA streams that will be utilized for parallel execution. 
- * It is typically optimized based on the target hardware.
+/** 
+ * @def NUM_STREAMS
+ * @brief Number of CUDA streams to use.
+ *
+ * Specifies how many CUDA streams are utilized for parallel execution.
  */
 #define NUM_STREAMS 8
 
-/**
- * @brief The number of chunks to process.
- * 
- * This macro defines the number of chunks to split the data into for parallel processing.
+/** 
+ * @def CHUNKS
+ * @brief Number of chunks for data splitting.
+ *
+ * Defines into how many chunks the data should be split for parallel processing.
  */
 #define CHUNKS 64
 
-/**
- * @brief The number of threads per block in CUDA.
- * 
- * This macro defines the number of threads that will be assigned to each block in CUDA kernel execution.
+/** 
+ * @def THREADS_PER_BLOCK
+ * @brief Number of threads per block in CUDA.
+ *
+ * Defines the number of threads assigned to each CUDA block during kernel execution.
  */
 #define THREADS_PER_BLOCK 64ULL
 
-/**
+/** 
+ * @def BATCH_PROCESSING
  * @brief Enable batch processing.
- * 
- * If this macro is defined, batch processing is enabled for the hashing operations.
+ *
+ * If defined, enables batch-based hashing operations.
  */
-// #define BATCH_PROCESSING
+#define BATCH_PROCESSING
 
-/**
+/** 
+ * @def CPU_SHA1_RUN
  * @brief Enable CPU-based SHA-1 hash computation.
- * 
- * If this macro is defined, the SHA-1 hashing operation will run on the CPU.
+ *
+ * If defined, the SHA-1 hashing will be performed on the CPU.
  */
-#define CPU_SHA1_RUN
+// #define CPU_SHA1_RUN
 
-/**
+/** 
+ * @def CPU_SHA256_RUN
  * @brief Enable CPU-based SHA-256 hash computation.
- * 
- * If this macro is defined, the SHA-256 hashing operation will run on the CPU.
+ *
+ * If defined, the SHA-256 hashing will be performed on the CPU.
  */
 // #define CPU_SHA256_RUN
 
-/**
+/** 
+ * @def CPU_MD5_RUN
  * @brief Enable CPU-based MD5 hash computation.
- * 
- * If this macro is defined, the MD5 hashing operation will run on the CPU.
+ *
+ * If defined, the MD5 hashing will be performed on the CPU.
  */
-// #define CPU_SHAMD5_RUN
+// #define CPU_MD5_RUN
 
-/**
+/** 
+ * @def CPU_HASH_RUN
+ * @brief Enable CPU-based hashing computation.
+ *
+ * If defined, the CPU versions of all hashing algorithms will run.
+ */
+// #define CPU_HASH_RUN
+
+/** 
+ * @def DEBUG_PRINT_HASHES
  * @brief Enable debug printing of hashes.
- * 
- * If this macro is defined, debug information related to hash computations will be printed.
+ *
+ * If defined, debug information about hash computations will be printed.
  */
 // #define DEBUG_PRINT_HASHES
 
-/**
+/** 
+ * @def PRINT_GPU_INFO
  * @brief Enable printing of GPU information.
- * 
- * If this macro is defined, information about the GPU hardware and CUDA execution will be printed.
+ *
+ * If defined, prints details about the GPU hardware and CUDA execution environment.
  */
 // #define PRINT_GPU_INFO
+
+/** 
+ * @def SHA1_PARALLEL
+ * @brief Enable parallel SHA-1 computation on GPU.
+ */
+// #define SHA1_PARALLEL
+
+/** 
+ * @def MD5_PARALLEL
+ * @brief Enable parallel MD5 computation on GPU.
+ */
+// #define MD5_PARALLEL
+
+/** 
+ * @def SHA256_PARALLEL
+ * @brief Enable parallel SHA-256 computation on GPU.
+ */
+// #define SHA256_PARALLEL
+
+#endif /* CONFIG_H */

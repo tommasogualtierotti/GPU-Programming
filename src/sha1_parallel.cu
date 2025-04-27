@@ -106,7 +106,6 @@ __global__ void sha1_kernel(const char *data,
 }
 
 #ifdef USE_STREAMS
-
 /**
  * @brief Create CUDA streams for asynchronous work.
  *
@@ -148,7 +147,6 @@ static void cuda_streams_destroy(cudaStream_t *streams)
  */
 void parallel_sha1_batch_reading(uint32_t *hashes)
 {
-    /* Host & device buffers */
     char **input_strings = NULL;
     size_t *data_length = NULL;
     char *d_data; uint32_t *d_hashes; size_t *d_lengths;
@@ -356,7 +354,7 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
         CHECK_CUDA_ERROR(cudaGetLastError());
 
         CHECK_CUDA_ERROR(cudaMemcpyAsync(hashes + off_len * SHA1_HASH_LENGTH, d_hashes + off_len * SHA1_HASH_LENGTH,
-                                         lines * SHA1_HASH_LENGTH * sizeof(uint32_t),
+                                         lines * SHA1_HASH_LENGTH * sizeof(hashes[0]),
                                          cudaMemcpyDeviceToHost, streams[s]));
 
         off_len  += lines;

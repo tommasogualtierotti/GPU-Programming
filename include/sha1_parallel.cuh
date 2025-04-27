@@ -1,6 +1,5 @@
 #ifndef SHA1_PARALLEL_CUH
-    #define SHA1_PARALLEL_CUH
-#endif
+#define SHA1_PARALLEL_CUH
 
 #ifndef UTILITIES_H
     #include "utilities.h"
@@ -38,3 +37,5 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
  *               total_file_lines × 5 uint32_t entries.
  */
 void parallel_sha1_batch_reading(uint32_t *hashes);
+
+#endif

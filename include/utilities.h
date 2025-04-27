@@ -25,6 +25,10 @@
 #define MSECPSEC_DIV (float)MSECPSEC
 
 #define SHA1_HASH_LENGTH 5ULL /**< Number of 32‑bit words in a SHA‑1 hash (20 bytes) */
+#define SHA1_HASH_LENGTH_BYTES 20ULL /**< Number of 32‑bit words in a SHA‑1 hash (20 bytes) */
+#define MD5_HASH_LENGTH 4ULL /**< Number of 32‑bit words in a MD5 hash (16 bytes) */
+#define MD5_HASH_LENGTH_BYTES 16ULL
+#define SHA256_HASH_LENGTH_BYTES 32ULL /**< Number of bytes in a SHA-256 hash (32 bytes) */
 
 #define BATCH_SIZE (BATCH_NUM_LINES * MAX_STRING_LENGTH) /**< Total bytes per batch */
 
@@ -159,3 +163,51 @@ void print_sha1_hashes_gpu(uint32_t *hashes, char **strings, size_t num_lines);
  * @param num_lines Number of strings (and hashes).
  */
 void print_sha1_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines);
+
+/**
+ * @brief Print MD5 hashes computed on the GPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 4‑word (16‑byte) hash in hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (16 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_md5_hashes_gpu(uint8_t *hashes, char **strings, size_t num_lines);
+
+/**
+ * @brief Print MD5 hashes computed on the CPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 16‑byte hash in two‑digit hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (16 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_md5_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines);
+
+/**
+ * @brief Print SHA-256 hashes computed on the GPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 8‑word (32‑byte) hash in hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (32 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_sha256_hashes_gpu(uint8_t *hashes, char **strings, size_t num_lines);
+
+/**
+ * @brief Print SHA‑256 hashes computed on the CPU.
+ *
+ * For each string and its hash, prints the string followed by its
+ * 32‑byte hash in two‑digit hexadecimal.
+ *
+ * @param hashes Array of uint8_t hashes (32 bytes per string).
+ * @param strings Array of input strings.
+ * @param num_lines Number of strings (and hashes).
+ */
+void print_sha256_hashes_cpu(uint8_t *hashes, char **strings, size_t num_lines);
