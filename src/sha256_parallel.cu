@@ -411,16 +411,18 @@ void parallel_sha256_batch_reading(uint8_t *hashes)
         CHECK_CUDA_ERROR(cudaEventElapsedTime(&elapsed_time_nostream_gpu, start, stop));
         total_time_nostream_gpu += elapsed_time_nostream_gpu;
 #endif
- 
-        // for (size_t i = 0; i < num_lines; i++)
-        // {
-        //     printf("String: %s\tHash: ", input_strings[i]);
-        //     for (size_t j = 0; j < SHA256_HASH_LENGTH_BYTES; ++j) 
-        //     {
-        //         printf("%02x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA256_HASH_LENGTH_BYTES + j]);
-        //     }
-        //     printf("\n");
-        // }
+
+#ifdef DEBUG_PRINT_HASHES
+        for (size_t i = 0; i < num_lines; i++)
+        {
+            printf("String: %s\tHash: ", input_strings[i]);
+            for (size_t j = 0; j < SHA256_HASH_LENGTH_BYTES; ++j) 
+            {
+                printf("%02x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * SHA256_HASH_LENGTH_BYTES + j]);
+            }
+            printf("\n");
+        }
+#endif
 
         batch_iteration++;
     } while (reader->batch_read_items == BATCH_NUM_LINES);

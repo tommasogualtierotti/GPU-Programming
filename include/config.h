@@ -113,7 +113,7 @@
  *
  * If defined, debug information about hash computations will be printed.
  */
-// #define DEBUG_PRINT_HASHES
+#define DEBUG_PRINT_HASHES
 
 /** 
  * @def PRINT_GPU_INFO
@@ -127,18 +127,18 @@
  * @def SHA1_PARALLEL
  * @brief Enable parallel SHA-1 computation on GPU.
  */
-// #define SHA1_PARALLEL
+#define SHA1_PARALLEL
 
 /** 
  * @def MD5_PARALLEL
  * @brief Enable parallel MD5 computation on GPU.
  */
-// #define MD5_PARALLEL
+#define MD5_PARALLEL
 
 /** 
  * @def SHA256_PARALLEL
  * @brief Enable parallel SHA-256 computation on GPU.
  */
-// #define SHA256_PARALLEL
+#define SHA256_PARALLEL
 
 #endif /* CONFIG_H */

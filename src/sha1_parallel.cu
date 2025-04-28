@@ -257,6 +257,18 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         total_time_nostream_gpu += elapsed_time_nostream_gpu;
 #endif
 
+#ifdef DEBUG_PRINT_HASHES
+        for (size_t i = 0; i < num_lines; i++)
+        {
+            printf("String: %s\tHash: ", input_strings[i]);
+            for (size_t j = 0; j < SHA1_HASH_LENGTH_BYTES / sizeof(hashes[0]); ++j) 
+            {
+                printf("%02x", hashes[(batch_iteration * BATCH_NUM_LINES + i) * (SHA1_HASH_LENGTH_BYTES / sizeof(hashes[0])) + j]);
+            }
+            printf("\n");
+        }
+#endif
+
         batch_iteration++;
     } while (reader->batch_read_items == BATCH_NUM_LINES);
 

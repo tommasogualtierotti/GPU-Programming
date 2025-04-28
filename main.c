@@ -85,7 +85,7 @@ int main() {
     CHECK_NULL(reader);
 
 #ifdef SHA1_PARALLEL
-    parallel_sha1_batch_reading(sha1_hashes); // handle in an another way the stop condition in the batch reading
+    parallel_sha1_batch_reading(sha1_hashes);
 #endif
 #ifdef MD5_PARALLEL
     parallel_md5_batch_reading(md5_hashes);
@@ -221,6 +221,7 @@ int main() {
 #endif
 
 #ifdef DEBUG_PRINT_HASHES
+#ifndef BATCH_PROCESSING
 #ifdef SHA1_PARALLEL
     print_sha1_hashes_gpu(sha1_hashes, input_strings, num_lines);
 #endif
@@ -229,6 +230,7 @@ int main() {
 #endif
 #ifdef SHA256_PARALLEL
     print_sha256_hashes_gpu(sha256_hashes, input_strings, num_lines);
+#endif
 #endif
 #endif
 
