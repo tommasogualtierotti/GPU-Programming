@@ -357,17 +357,30 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
         size_t bytes = lines * MAX_STRING_LENGTH;
         int s = i % NUM_STREAMS;
 
-        CHECK_CUDA_ERROR(cudaMemcpyAsync(d_data + off_data, h_data + off_data, bytes, cudaMemcpyHostToDevice, streams[s]));
-        CHECK_CUDA_ERROR(cudaMemcpyAsync(d_lengths + off_len, lengths + off_len, lines * sizeof(size_t), cudaMemcpyHostToDevice, streams[s]));
+        CHECK_CUDA_ERROR(cudaMemcpyAsync(d_data + off_data, 
+                                         h_data + off_data, 
+                                         bytes, 
+                                         cudaMemcpyHostToDevice, 
+                                         streams[s]));
+        CHECK_CUDA_ERROR(cudaMemcpyAsync(d_lengths + off_len, 
+                                         lengths + off_len, 
+                                         lines * sizeof(size_t), 
+                                         cudaMemcpyHostToDevice, 
+                                         streams[s]));
 
         size_t blocks = (lines + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
         sha1_kernel<<<blocks, THREADS_PER_BLOCK, 0, streams[s]>>>
-            (d_data + off_data, d_hashes + off_len * SHA1_HASH_LENGTH, d_lengths + off_len, lines);
+                (d_data + off_data, 
+                 d_hashes + off_len * SHA1_HASH_LENGTH, 
+                 d_lengths + off_len, 
+                 lines);
         CHECK_CUDA_ERROR(cudaGetLastError());
 
-        CHECK_CUDA_ERROR(cudaMemcpyAsync(hashes + off_len * SHA1_HASH_LENGTH, d_hashes + off_len * SHA1_HASH_LENGTH,
+        CHECK_CUDA_ERROR(cudaMemcpyAsync(hashes + off_len * SHA1_HASH_LENGTH,
+                                         d_hashes + off_len * SHA1_HASH_LENGTH,
                                          lines * SHA1_HASH_LENGTH * sizeof(hashes[0]),
-                                         cudaMemcpyDeviceToHost, streams[s]));
+                                         cudaMemcpyDeviceToHost, 
+                                         streams[s]));
 
         off_len  += lines;
         off_data += bytes;
@@ -387,6 +400,7 @@ void parallel_sha1(const char **data, const size_t *lengths, size_t num_lines, u
 
     size_t blocks = (num_lines + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
     sha1_kernel<<<blocks, THREADS_PER_BLOCK>>>(d_data, d_hashes, d_lengths, num_lines);
+    CHECK_CUDA_ERROR(cudaGetLastError());
     CHECK_CUDA_ERROR(cudaDeviceSynchronize());
 
     CHECK_CUDA_ERROR(cudaMemcpy(hashes, d_hashes, num_lines * SHA1_HASH_LENGTH * sizeof(hashes[0]), cudaMemcpyDeviceToHost));
