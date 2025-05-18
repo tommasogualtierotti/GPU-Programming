@@ -55,7 +55,7 @@ INC_DIR = include
 ## Make variables ##
 
 # Target executable name:
-EXE = test
+EXE ?= test
 
 # Object files:
 OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/utilities.o $(OBJ_DIR)/sha1.o $(OBJ_DIR)/sha256.o $(OBJ_DIR)/md5.o $(OBJ_DIR)/cuda_utilities.o $(OBJ_DIR)/md5_parallel.o $(OBJ_DIR)/sha256_parallel.o
