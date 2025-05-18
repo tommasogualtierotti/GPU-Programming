@@ -4,3 +4,5 @@ test
 dataset/*.dict
 Doxyfile
 docs/*
+# Ignore all files in the root without a dot (e.g., executables like 'test', 'myprogram')
+/[!.*]*
