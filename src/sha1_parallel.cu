@@ -200,9 +200,9 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
         size_t base_lines = num_lines / active_chunks, extra = num_lines % active_chunks;
         size_t off_len = 0, off_data = 0, off_hash = 0;
 
-        CHECK_CUDA_ERROR(cudaMemset(d_data,   0, BATCH_SIZE));
-        CHECK_CUDA_ERROR(cudaMemset(d_lengths,0, BATCH_NUM_LINES * sizeof(size_t)));
-        CHECK_CUDA_ERROR(cudaMemset(d_hashes,0, BATCH_NUM_LINES * SHA1_HASH_LENGTH * sizeof(hashes[0])));
+        // CHECK_CUDA_ERROR(cudaMemset(d_data,   0, BATCH_SIZE));
+        // CHECK_CUDA_ERROR(cudaMemset(d_lengths,0, BATCH_NUM_LINES * sizeof(size_t)));
+        // CHECK_CUDA_ERROR(cudaMemset(d_hashes,0, BATCH_NUM_LINES * SHA1_HASH_LENGTH * sizeof(hashes[0])));
 
         for (size_t i = 0; i < active_chunks; i++)
         {
@@ -237,10 +237,10 @@ void parallel_sha1_batch_reading(uint32_t *hashes)
 #else
         total_size = num_lines * MAX_STRING_LENGTH;
         CHECK_CUDA_ERROR(cudaEventRecord(start));
-        CHECK_CUDA_ERROR(cudaMemset(d_data,   0, BATCH_SIZE));
-        CHECK_CUDA_ERROR(cudaMemset(d_lengths,0, BATCH_NUM_LINES * sizeof(size_t)));
-        CHECK_CUDA_ERROR(cudaMemset(d_hashes,0, BATCH_NUM_LINES * SHA1_HASH_LENGTH * sizeof(hashes[0])));
-        CHECK_CUDA_ERROR(cudaDeviceSynchronize());
+        // CHECK_CUDA_ERROR(cudaMemset(d_data,   0, BATCH_SIZE));
+        // CHECK_CUDA_ERROR(cudaMemset(d_lengths,0, BATCH_NUM_LINES * sizeof(size_t)));
+        // CHECK_CUDA_ERROR(cudaMemset(d_hashes,0, BATCH_NUM_LINES * SHA1_HASH_LENGTH * sizeof(hashes[0])));
+        // CHECK_CUDA_ERROR(cudaDeviceSynchronize());
         CHECK_CUDA_ERROR(cudaMemcpy(d_data,    h_data,   total_size, cudaMemcpyHostToDevice));
         CHECK_CUDA_ERROR(cudaMemcpy(d_lengths, data_length, num_lines * sizeof(size_t), cudaMemcpyHostToDevice));
         size_t blocks = (num_lines + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;

@@ -67,6 +67,8 @@ OBJS = $(OBJ_DIR)/main.o $(OBJ_DIR)/sha1_parallel.o $(OBJ_DIR)/utilities.o $(OBJ
 # Link c++ and CUDA compiled object files to target executable:
 $(EXE) : $(OBJS)
 	$(CC) $(CC_FLAGS) $(OBJS) -o $@ $(CUDA_INC_DIR) $(CUDA_LIB_DIR) $(CUDA_LINK_LIBS)
+	$(MKDIR) -p exe
+	mv $(EXE) exe/
 
 # Compile main .c file to object files:
 $(OBJ_DIR)/%.o : %.c $(OBJ_DIR) 
@@ -82,9 +84,11 @@ $(OBJ_DIR)/%.o : $(SRC_DIR)/%.cu $(INC_DIR)/%.cuh $(OBJ_DIR)
 
 $(OBJ_DIR):
 	$(MKDIR) -p $@
+
 # Clean objects in object directory.
 clean:
-	$(RM) -r bin/ *.txt
+	$(RM) -rf bin
+#	$(RM) -rf exe
 	$(RM) $(EXE)
 	$(RM) -rf docs/*
 
