@@ -5,7 +5,7 @@
 
 // CHANGE THESE
 #show: report.with(
-  title: "Comparative performance analysis of SHA-1 hashing on GPU and CPU architectures",
+  title: "Comparative Performance Analysis\nof hashing algorithms on GPU and CPU",
   authors: (
     "Simone Mulazzi s330471",
     "Tommaso Gualtierotti s329534",
@@ -29,6 +29,27 @@ This project investigates the effectiveness of parallel hashing on GPU architect
 #pagebreak()
 
 = Implementation
+
+== Datasets
+
+In this project, four different datasets were used. Each dataset contains entries shorter than 30 characters. The number of entries of the datasets are widely different, in order to have a test set which can characterize well the experiment. @datasets_recap_table shows a brief recap of datasets' number of entries.
+
+#figure(
+  table(
+  columns: 2,
+  align: left,
+  stroke: 1pt,
+  [*Filename*],
+  [*Number of entries*],
+  [`test.dict`],
+  [#align(center, [79])],
+  [`italian.dict`],
+  [#align(center, [385 750])],
+  [`all_patterns.dict`],
+  [#align(center, [17 895 696])],
+  [`realhuman_phill.dict`],
+  [#align(center, [63 941 069])],
+), caption: [Datasets recap]) <datasets_recap_table>
 
 == GPU implementation
 
@@ -178,8 +199,15 @@ Here the following are performed:
 
 #figure(
   ```c
-CHECK_CUDA_ERROR(cudaMemcpy(d_data, h_data, total_size, cudaMemcpyHostToDevice));
-CHECK_CUDA_ERROR(cudaMemcpy(d_lengths, lengths, num_lines * sizeof(size_t), cudaMemcpyHostToDevice));
+CHECK_CUDA_ERROR(cudaMemcpy(d_data,
+                            h_data, 
+                            total_size, 
+                            cudaMemcpyHostToDevice));
+
+CHECK_CUDA_ERROR(cudaMemcpy(d_lengths, 
+                            lengths, 
+                            num_lines * sizeof(size_t), 
+                            cudaMemcpyHostToDevice));
 
 size_t blocks = (num_lines + THREADS_PER_BLOCK - 1) / THREADS_PER_BLOCK;
 
@@ -502,8 +530,8 @@ In @sha1_cpu_vs_gpu_comparison, execution time of different configurations runni
 The picture, perfectly highlights and shows the speedup that can be obtained using GPUs. \
 As you might expect, with a very small dataset (first row of @sha1_cpu_vs_gpu_comparison), the overhead of GPUs if fully dominating the execution time, therefore it goes naturally that CPU is faster overall. However it is interesting to note that using streams execution, GPU is able to drop a lot of overhead and the total execution time is very scaled compared to non streams execution. \
 Scrolling down the rows of the table is easy to notice that with the increasing of the dataset size, the performance of GPU with respect to the CPU are notably better, this is due to the first concept of GPU programming, i.e. GPUs beats CPUs not on single core performance but on multicore performance and on throughput. Therefore, the hash of a single string will _always_ take more time on a GPU with respect to a CPU, but, whilst on a consumer CPU you can have at most tens of cores, on consumer GPU you can have hundreds of them and if filled correctly, the performance improving is remarkable. \ \
-In @sha1_cpu_vs_gpu_comparison only the results of SHA1 algorithms are shown, despite other algorithms with the same structure, like MD5 and SHA256 perform in a similary way. \
-It also worth notice that the code running, using batch processing, there is an overhead in both the executions, this is obviously due to the fact that dataset is read in fixed-size batches and the whole dataset is not fitted entirely on VRAM (GPU DRAM). \ \
+In @sha1_cpu_vs_gpu_comparison, @md5_cpu_vs_gpu_comparison and @sha256_cpu_vs_gpu_comparison the results of hashing algorithms performance are shown. Please note that when a $crossmark$ is shown is due to the fact that that specific configuration cannot be run on the available setup (more specifically, the whole dataset does not fit in GPU VRAM). \
+It also worth notice that the code running using batch processing (with a fixed size of $10^6$ items per batch), shows an overhead in both the executions, this is obviously due to the fact that dataset is read in fixed-size batches and the whole dataset is not fitted entirely on VRAM (GPU DRAM). \ \
 The implementation then leads to a maximum speedup of about *7 or 8 times* using standard CUDA code, while using streams execution it leads to a speedup of about *10 or 11 times*. If using batch processing the speedup is limited to *4 or 5 times* depending on whether streams execution is used or not. This is due to the fact that in batch processing part of the execution is done on the CPU (dataset reading).
 
 #figure(
@@ -547,6 +575,90 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   [$crossmark$],
   [7995 ms],
 ), caption: [Comparison of SHA1 execution time between CPU and GPU]) <sha1_cpu_vs_gpu_comparison>
+
+#figure(
+  table(
+  columns: 7,
+  align: center,
+  stroke: none,
+  [*Dataset\ lines*],
+  [*CPU*],
+  [*CPU BP*],
+  [*GPU*],
+  [*GPU BP*],
+  [*GPU\ streams*],
+  [*GPU BP\ streams*],
+  [79],
+  [0.037 ms],
+  [0.062 ms],
+  [241.4 ms],
+  [246.3 ms],
+  [1.3 ms],
+  [23.955 ms],
+  [$3.8 times 10^5$],
+  [170.32 ms],
+  [209.9 ms],
+  [258.4 ms],
+  [301.7 ms],
+  [19.1 ms],
+  [24.74 ms],
+  [$18 times 10^6$],
+  [7804.7 ms],
+  [9296.6 ms],
+  [1106.7 ms],
+  [2536.6 ms],
+  [803.8 ms],
+  [2048.8 ms],
+  [$64 times 10^6$],
+  [$crossmark$],
+  [34749 ms],
+  [$crossmark$],
+  [8732 ms],
+  [$crossmark$],
+  [7563 ms],
+), caption: [Comparison of MD5 execution time between CPU and GPU]) <md5_cpu_vs_gpu_comparison>
+
+#figure(
+  table(
+  columns: 7,
+  align: center,
+  stroke: none,
+  [*Dataset\ lines*],
+  [*CPU*],
+  [*CPU BP*],
+  [*GPU*],
+  [*GPU BP*],
+  [*GPU\ streams*],
+  [*GPU BP\ streams*],
+  [79],
+  [0.04 ms],
+  [0.07 ms],
+  [225.6 ms],
+  [253.28 ms],
+  [0.781 ms],
+  [25.1 ms],
+  [$3.8 times 10^5$],
+  [218.51 ms],
+  [256.88 ms],
+  [248.4 ms],
+  [317.8 ms],
+  [21.97 ms],
+  [71.44 ms],
+  [$18 times 10^6$],
+  [10234 ms],
+  [11676 ms],
+  [1309.2 ms],
+  [2739.4 ms],
+  [898.67 ms],
+  [2187.8 ms],
+  [$64 times 10^6$],
+  [$crossmark$],
+  [42768 ms],
+  [$crossmark$],
+  [9528 ms],
+  [$crossmark$],
+  [7943 ms],
+), caption: [Comparison of SHA256 execution time between CPU and GPU]) <sha256_cpu_vs_gpu_comparison>
 
 // = TEST
 
