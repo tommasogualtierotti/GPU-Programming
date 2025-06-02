@@ -348,6 +348,10 @@ The number of CUDA threads per block (`THREADS_PER_BLOCK`) can be configured sta
 // Keep block sizes aligned with the GPU’s warp size (typically 32) for optimal occupancy.
 */
 
+== Streams and Chunks count
+
+The number of Cuda Streams (`NUM_STREAMS`) can be configured statically using the `config.h` file when using streams execution. As well can be done for chunks (`NUM_CHUNKS`) in which the dataset is split in order to feed the various streams during the execution. A typical configuration involves 64 chunks for 8 streams.
+
 == CPU implementation
 
 The CPU implementation of the hashing algorithms and the GPU code structure are mirrored to be as similar as possible, ensuring a fair baseline. This choice is lead by the will of having a baseline as similar as possible, in order to give still more meaning to the comparison between CPU and GPU algorithms execution.
@@ -471,7 +475,7 @@ This suggests that:
   table(
   columns: 3,
   align: center,
-  stroke: none,
+  stroke: 0.5pt,
   [*Kernel*],
   [*Memory throughput*],
   [*Compute throughput*],
@@ -538,7 +542,7 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   table(
   columns: 7,
   align: center,
-  stroke: none,
+  stroke: 0.5pt,
   [*Dataset\ lines*],
   [*CPU*],
   [*CPU BP*],
@@ -580,7 +584,7 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   table(
   columns: 7,
   align: center,
-  stroke: none,
+  stroke: 0.5pt,
   [*Dataset\ lines*],
   [*CPU*],
   [*CPU BP*],
@@ -622,7 +626,7 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   table(
   columns: 7,
   align: center,
-  stroke: none,
+  stroke: 0.5pt,
   [*Dataset\ lines*],
   [*CPU*],
   [*CPU BP*],
@@ -659,6 +663,8 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   [$crossmark$],
   [7943 ms],
 ), caption: [Comparison of SHA256 execution time between CPU and GPU]) <sha256_cpu_vs_gpu_comparison>
+
+\* Please note that the wording *`BP`* in @sha1_cpu_vs_gpu_comparison @md5_cpu_vs_gpu_comparison @sha256_cpu_vs_gpu_comparison stands for *Batch Processing*
 
 // = TEST
 
