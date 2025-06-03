@@ -664,7 +664,7 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   [7943 ms],
 ), caption: [Comparison of SHA256 execution time between CPU and GPU]) <sha256_cpu_vs_gpu_comparison>
 
-\* Please note that the wording *`BP`* in @sha1_cpu_vs_gpu_comparison @md5_cpu_vs_gpu_comparison @sha256_cpu_vs_gpu_comparison stands for *Batch Processing*
+\* Please note that the wording *`BP`* in @sha1_cpu_vs_gpu_comparison, @md5_cpu_vs_gpu_comparison, @sha256_cpu_vs_gpu_comparison stands for *Batch Processing*
 
 // = TEST
 
