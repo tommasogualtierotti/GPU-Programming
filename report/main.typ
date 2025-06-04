@@ -534,7 +534,7 @@ In @sha1_cpu_vs_gpu_comparison, execution time of different configurations runni
 The picture, perfectly highlights and shows the speedup that can be obtained using GPUs. \
 As you might expect, with a very small dataset (first row of @sha1_cpu_vs_gpu_comparison), the overhead of GPUs if fully dominating the execution time, therefore it goes naturally that CPU is faster overall. However it is interesting to note that using streams execution, GPU is able to drop a lot of overhead and the total execution time is very scaled compared to non streams execution. \
 Scrolling down the rows of the table is easy to notice that with the increasing of the dataset size, the performance of GPU with respect to the CPU are notably better, this is due to the first concept of GPU programming, i.e. GPUs beats CPUs not on single core performance but on multicore performance and on throughput. Therefore, the hash of a single string will _always_ take more time on a GPU with respect to a CPU, but, whilst on a consumer CPU you can have at most tens of cores, on consumer GPU you can have hundreds of them and if filled correctly, the performance improving is remarkable. \ \
-In @sha1_cpu_vs_gpu_comparison, @md5_cpu_vs_gpu_comparison and @sha256_cpu_vs_gpu_comparison the results of hashing algorithms performance are shown. Please note that when a $crossmark$ is shown is due to the fact that that specific configuration cannot be run on the available setup (more specifically, the whole dataset does not fit in GPU VRAM). \
+In @sha1_cpu_vs_gpu_comparison, @md5_cpu_vs_gpu_comparison and @sha256_cpu_vs_gpu_comparison the results of hashing algorithms performance are shown. \
 It also worth notice that the code running using batch processing (with a fixed size of $10^6$ items per batch), shows an overhead in both the executions, this is obviously due to the fact that dataset is read in fixed-size batches and the whole dataset is not fitted entirely on VRAM (GPU DRAM). \ \
 The implementation then leads to a maximum speedup of about *7 or 8 times* using standard CUDA code, while using streams execution it leads to a speedup of about *10 or 11 times*. If using batch processing the speedup is limited to *4 or 5 times* depending on whether streams execution is used or not. This is due to the fact that in batch processing part of the execution is done on the CPU (dataset reading).
 
@@ -664,7 +664,8 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
   [7943 ms],
 ), caption: [Comparison of SHA256 execution time between CPU and GPU]) <sha256_cpu_vs_gpu_comparison>
 
-\* Please note that the wording *`BP`* in @sha1_cpu_vs_gpu_comparison, @md5_cpu_vs_gpu_comparison, @sha256_cpu_vs_gpu_comparison stands for *Batch Processing*
+\* Please note that the wording *`BP`* in @sha1_cpu_vs_gpu_comparison @md5_cpu_vs_gpu_comparison @sha256_cpu_vs_gpu_comparison stands for *Batch Processing* \
+\* Please note that when a $crossmark$ is shown is due to the fact that that specific configuration cannot be run on the available setup (more specifically, the whole dataset does not fit in GPU VRAM).
 
 // = TEST
 
