@@ -674,3 +674,11 @@ The implementation then leads to a maximum speedup of about *7 or 8 times* using
 // + Run *`n`* times for each GPU, with and without streams, and CPU algorithm for each dataset (all_patterns.dict, italian.dict, test.dict, fb_usernames.dict) to get execution times.
 // + Run *`n`* times for each GPU, with and without streams, and CPU algorithm in batch processing mode for each dataset (all_patterns.dict, italian.dict, test.dict, fb_usernames.dict, realhuman_phill.dict) for different batch sizes to get execution times.
 // + Profile GPU kernels, for each dataset, for each algorithm, also for batch processing, and compute the position in the roofline diagram. (Does it make sense to perform this step more than once?)
+
+#pagebreak()
+
+= References
+
+#show link: underline
+
+#link("https://github.com/tommasogualtierotti/GPU-Programming/#")[Github - Comparative Performance Analysis\nof hashing algorithms on GPU and CPU]
