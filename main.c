@@ -36,7 +36,6 @@
 
 int main() {
 
-    printf("NUMBER OF STREAMS: %llu\n", NUM_STREAMS);
     char **input_strings = NULL;
     size_t *data_length = NULL;
 
