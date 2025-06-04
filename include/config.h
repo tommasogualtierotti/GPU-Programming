@@ -15,7 +15,7 @@
  *
  * Defines the path to the dictionary file that will be used in the application.
  */
-#define FILENAME_PATH "dataset/test.dict"
+#define FILENAME_PATH "dataset/all_patterns.dict"
 
 /** 
  * @def BATCH_NUM_LINES
@@ -49,7 +49,7 @@
  *
  * Specifies how many CUDA streams are utilized for parallel execution.
  */
-#define NUM_STREAMS 8
+#define NUM_STREAMS 8ULL
 
 /** 
  * @def CHUNKS
@@ -57,7 +57,7 @@
  *
  * Defines into how many chunks the data should be split for parallel processing.
  */
-#define CHUNKS 64
+#define CHUNKS 64ULL
 
 /** 
  * @def THREADS_PER_BLOCK
@@ -73,7 +73,7 @@
  *
  * If defined, enables batch-based hashing operations.
  */
-#define BATCH_PROCESSING
+// #define BATCH_PROCESSING
 
 /** 
  * @def CPU_SHA1_RUN
@@ -113,7 +113,7 @@
  *
  * If defined, debug information about hash computations will be printed.
  */
-#define DEBUG_PRINT_HASHES
+// #define DEBUG_PRINT_HASHES
 
 /** 
  * @def PRINT_GPU_INFO
@@ -133,12 +133,12 @@
  * @def MD5_PARALLEL
  * @brief Enable parallel MD5 computation on GPU.
  */
-#define MD5_PARALLEL
+// #define MD5_PARALLEL
 
 /** 
  * @def SHA256_PARALLEL
  * @brief Enable parallel SHA-256 computation on GPU.
  */
-#define SHA256_PARALLEL
+// #define SHA256_PARALLEL
 
 #endif /* CONFIG_H */
