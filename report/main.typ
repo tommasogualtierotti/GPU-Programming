@@ -2,6 +2,9 @@
 #import "@preview/fletcher:0.5.5" as fletcher: *
 #import "@preview/wrap-it:0.1.1": wrap-content
 #import "@preview/plotst:0.1.0": *
+#import "@preview/codly:1.2.0": *
+#import "@preview/codly-languages:0.1.1": *
+#show: codly-init.with()
 
 // CHANGE THESE
 #show: report.with(
