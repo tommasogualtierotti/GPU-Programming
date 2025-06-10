@@ -109,7 +109,7 @@ Re‑run `make` after editing.
 
 🛈 *For < 1 M lines the CPU wins due to GPU launch overhead; beyond that, the GPU dominates.*
 
-Detailed graphs and profiler screenshots live in [`report/report.pdf`](report/report.pdf).
+Detailed graphs and profiler screenshots live in [`report/report.pdf`](report/gpu?programming_report_group2.pdf).
 
 ---
 
