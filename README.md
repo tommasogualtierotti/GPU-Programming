@@ -48,8 +48,7 @@ The guiding question is **“How much throughput can a commodity GPU deliver for
 │   ├── gpu source files  # md5_kernel.cu, …         (CUDA kernels)
 │   └── utilities.c       # I/O helpers, timers, pretty printers
 ├── dataset/              # Large CSV test files (Git LFS)
-├── exe/                  # Compiled binaries
-└── docs/
+└── report/
     └── report.pdf        # Full write‑up with graphs & analysis
 ```
 
@@ -110,7 +109,7 @@ Re‑run `make` after editing.
 
 🛈 *For < 1 M lines the CPU wins due to GPU launch overhead; beyond that, the GPU dominates.*
 
-Detailed graphs and profiler screenshots live in [`docs/report.pdf`](docs/report.pdf).
+Detailed graphs and profiler screenshots live in [`report/report.pdf`](report/report.pdf).
 
 ---
 
